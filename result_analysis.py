@@ -130,8 +130,8 @@ for n in range(0, len(xlfile_path_list)):
                         else:
                             sheet.cell(row=row, column=column).fill = get_red()
                             
-                if sheet.cell(row=row, column=column).has_style:
-                    sheet_pre.cell(row=row, column=column).fill = sheet.cell(row=row, column=column).fill._StyleProxy__target
+                    if sheet.cell(row=row, column=column).has_style:
+                        sheet_pre.cell(row=row, column=column).fill = sheet.cell(row=row, column=column).fill._StyleProxy__target
     #２日目以降のデータ                        
     else:
         for row in range(3, sheet.max_row+1):
@@ -188,9 +188,12 @@ for n in range(0, len(xlfile_path_list)):
                         if value_pre_tsubomi != 0 or value_pre_flower != 0:
                             sheet_init.cell(row=row, column=column).value = 0
                             sheet_init.cell(row=row+1, column=column).value = 0
-                            sheet.cell(row=row, column=column).fill = get_blue()
                             sheet_uekae_write.cell(row=row, column=column).value = int(date_name)
+                            sheet.cell(row=row, column=column).fill = get_blue()
                             
+                    if sheet_pre.cell(row=row, column=column).fill == get_blue():
+                        sheet.cell(row=row, column=column).fill = get_blue()
+                                
     for row in range(3, sheet.max_row+1):
         for column in range(2, sheet.max_column+1):
             sheet_pre.cell(row=row, column=column).value = sheet.cell(row=row, column=column).value
