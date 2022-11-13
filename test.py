@@ -196,7 +196,11 @@ for n in range(0, len(xlfile_path_list)):
                         sheet.cell(row=row+1, column=column).fill = get_red(value_flower*70)
                         #前日花が咲いていなければ、結果表に開花日を記録
                         if value_pre_flower == 0:
-                            sheet_init_2.cell(row=row+1, column=column).value = int(date_name)            
+                            sheet_init_2.cell(row=row+1, column=column).value = int(date_name)
+                    
+                            
+    #保存_調査票
+    wb.save(save_tyousa_path + "\\" + str(next_date_name) + ".xlsx")                
                                 
     for row in range(3, sheet.max_row+1):
         for column in range(2, sheet.max_column+1):
@@ -208,9 +212,9 @@ for row in range(3, sheet.max_row+1):
     for column in range(1, sheet.max_column+1):
         value_init = sheet_init.cell(row=row, column=column).value
         value_init_2 = sheet_init_2.cell(row=row, column=column).value
-        if column >= 2:
-            #調査票の中身を空欄に
-            sheet.cell(row=row, column=column).value = None
+        # if column >= 2:
+        #     #調査票の中身を空欄に
+        #     sheet.cell(row=row, column=column).value = None
         #tsubomi用にコピー
         if row % 2 == 1:
             sheet_tsubomi.cell(row=(row//2)+2, column=column).value = value_init
@@ -221,8 +225,7 @@ for row in range(3, sheet.max_row+1):
             sheet_flower.cell(row=row//2+1, column=column).value = value_init
             sheet_flower_2.cell(row=row//2+1, column=column).value = value_init_2                    
 
-#保存_調査票
-wb.save(save_tyousa_path + "\\" + str(next_date_name) + ".xlsx")    
+
 
 #保存_結果表（出力日は、エクセルリストの最後の日付）
 wb_init.save(save_result_path + "\\" + str(date_name) + "_result.xlsx")
