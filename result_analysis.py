@@ -119,8 +119,9 @@ for n in range(0, len(xlfile_path_list)):
                         sheet_uekae.cell(row=row, column=column).value = 0
                         sheet_init_2.cell(row=row, column=column).value = 0
                         sheet_uekae_write.cell(row=row, column=column).value = 0
+                        
                     #1のとき
-                    elif sheet.cell(row=row, column=column).value == 1:
+                    if sheet.cell(row=row, column=column).value == 1:
                         #sheet_initの1を日にちに置き換える
                         sheet_init.cell(row=row, column=column).value = int(date_name)
                         #各シートの開花日を赤
@@ -130,8 +131,6 @@ for n in range(0, len(xlfile_path_list)):
                         else:
                             sheet.cell(row=row, column=column).fill = get_red()
                             
-                    if sheet.cell(row=row, column=column).has_style:
-                        sheet_pre.cell(row=row, column=column).fill = sheet.cell(row=row, column=column).fill._StyleProxy__target
     #２日目以降のデータ                        
     else:
         for row in range(3, sheet.max_row+1):
@@ -141,9 +140,11 @@ for n in range(0, len(xlfile_path_list)):
                 value = sheet.cell(row=row, column=column).value
                 
                 #値がNoneなら前日の値を引き継ぐ
-                if value == None:
-                    sheet.cell(row=row, column=column).value = sheet_pre.cell(row=row, column=column).value
                 if row % 2 == 1:
+                    if sheet.cell(row=row, column=column).value == None:
+                        sheet.cell(row=row, column=column).value = sheet_pre.cell(row=row, column=column).value
+                        sheet.cell(row=row+1, column=column).value = sheet_pre.cell(row=row+1, column=column).value
+                        
                     #つぼみデータ行と花データ行の値を取得
                     value_tsubomi = sheet.cell(row=row, column=column).value
                     value_flower = sheet.cell(row=row+1, column=column).value
@@ -151,6 +152,22 @@ for n in range(0, len(xlfile_path_list)):
                     value_pre_tsubomi = sheet_pre.cell(row=row, column=column).value
                     value_pre_flower = sheet_pre.cell(row=row+1, column=column).value
                     
+                    #両方０のとき前日のつぼみか花が０でないなら調査票を青に塗る（植え替え）、結果表の日にちを０に戻す       
+                    if value_tsubomi == value_flower == 0:
+                        
+                        if value_pre_tsubomi != 0 or value_pre_flower != 0:
+                            #青に塗る
+                            sheet.cell(row=row, column=column).fill = get_blue()
+                            #日にちを０に戻す
+                            sheet_init.cell(row=row, column=column).value = 0
+                            sheet_init.cell(row=row+1, column=column).value = 0
+                            #植え替え日を記録
+                            sheet_uekae_write.cell(row=row, column=column).value = int(date_name)
+                        #前日も青なら塗る    
+                        if sheet_pre.cell(row=row, column=column).fill == get_blue():
+                            sheet.cell(row=row, column=column).fill = get_blue()    
+                        
+                        
                     #つぼみデータが１のとき
                     if value_tsubomi == 1:
                         #調査票を緑に塗る
@@ -179,27 +196,13 @@ for n in range(0, len(xlfile_path_list)):
                         sheet.cell(row=row+1, column=column).fill = get_red(value_flower*70)
                         #前日花が咲いていなければ、結果表に開花日を記録
                         if value_pre_flower == 0:
-                            sheet_init_2.cell(row=row+1, column=column).value = int(date_name)
-                    
-                            
-                    #両方０のとき前日のつぼみか花が０でないなら調査票を青に塗る（植え替え）、結果表の日にちを０に戻す       
-                    if value_tsubomi == value_flower == 0:
-                        sheet.cell(row=row, column=column).fill = sheet_pre.cell(row=row, column=column).fill._StyleProxy__target
-                        if value_pre_tsubomi != 0 or value_pre_flower != 0:
-                            sheet_init.cell(row=row, column=column).value = 0
-                            sheet_init.cell(row=row+1, column=column).value = 0
-                            sheet_uekae_write.cell(row=row, column=column).value = int(date_name)
-                            sheet.cell(row=row, column=column).fill = get_blue()
-                            
-                    if sheet_pre.cell(row=row, column=column).fill == get_blue():
-                        sheet.cell(row=row, column=column).fill = get_blue()
+                            sheet_init_2.cell(row=row+1, column=column).value = int(date_name)            
                                 
     for row in range(3, sheet.max_row+1):
         for column in range(2, sheet.max_column+1):
             sheet_pre.cell(row=row, column=column).value = sheet.cell(row=row, column=column).value
             sheet_pre.cell(row=row, column=column).fill = sheet.cell(row=row, column=column).fill._StyleProxy__target
-
-
+            
 #３行目からは
 for row in range(3, sheet.max_row+1):
     for column in range(1, sheet.max_column+1):
@@ -219,7 +222,7 @@ for row in range(3, sheet.max_row+1):
             sheet_flower_2.cell(row=row//2+1, column=column).value = value_init_2                    
 
 #保存_調査票
-wb.save(save_tyousa_path + "\\" + str(next_date_name) + ".xlsx")
+wb.save(save_tyousa_path + "\\" + str(next_date_name) + ".xlsx")    
 
 #保存_結果表（出力日は、エクセルリストの最後の日付）
 wb_init.save(save_result_path + "\\" + str(date_name) + "_result.xlsx")
