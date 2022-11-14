@@ -137,7 +137,6 @@ for n in range(0, len(xlfile_path_list)):
             for column in range(2, sheet.max_column+1):
                 
                 value_init = sheet_init.cell(row=row, column=column).value
-                value = sheet.cell(row=row, column=column).value
                 
                 #値がNoneなら前日の値を引き継ぐ
                 if row % 2 == 1:
