@@ -209,10 +209,4 @@ for i in range(1, max_value+1):
     blist[3*i-1].save(save_result_path + "\\" + str(date_name) + "_result_tsubomi_" + f"{i:02x}"+ ".xlsx")
     blist[3*i].save(save_result_path + "\\" + str(date_name) + "_result_flower_" + f"{i:02x}"+ ".xlsx")
 #保存_結果表（出力日は、エクセルリストの最後の日付）
-# blist[1].save(save_result_path + "\\" + str(date_name) + "_result.xlsx")
-# blist[2].save(save_result_path + "\\" + str(date_name) + "_result_tsubomi.xlsx")
-# blist[3].save(save_result_path + "\\" + str(date_name) + "_result_flower.xlsx")
-# blist[4].save(save_result_path + "\\" + str(date_name) + "_result_02.xlsx")
-# blist[5].save(save_result_path + "\\" + str(date_name) + "_result_tsubomi_02.xlsx")
-# blist[6].save(save_result_path + "\\" + str(date_name) + "_result_flower_02.xlsx")
 wb_uekae.save(save_result_path + "\\" + str(date_name) + "_result_uekae.xlsx")
