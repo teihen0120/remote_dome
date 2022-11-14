@@ -54,7 +54,10 @@ sheet_uekae = wb_uekae["Sheet1"]
 #flower = list[i%3==0]
 blist = []
 slist = []
-for i in range(10):
+
+max_value = 0
+
+for i in range(20):
     blist.append(px.Workbook())
     blist[i]["Sheet"].title = "Sheet1"
     slist.append(blist[i]["Sheet1"])
@@ -150,53 +153,45 @@ for n in range(0, len(xlfile_path_list)):
                             sheet.cell(row=row, column=column).fill = get_blue()    
                         
                         
-                    #つぼみデータが１のとき
-                    if value_tsubomi == 1:
+                    #つぼみデータが０以外の数字のとき
+                    if value_tsubomi != None and str(value_tsubomi).isdecimal():
+                        if value_tsubomi != 0:
                         #調査票を緑に塗る
-                        # green = get_green()
-                        sheet.cell(row=row, column=column).fill = get_green()
+                            sheet.cell(row=row, column=column).fill = get_green(value_tsubomi*70)
                         #前日つぼみが出ていなければ、結果表1に出蕾日を記録
-                        if value_pre_tsubomi == 0:
-                            slist[1].cell(row=row, column=column).value = int(date_name)
-                            
-                    elif value_tsubomi == 2:
-                        sheet.cell(row=row, column=column).fill = get_green(value_tsubomi*70)
-                        #前日つぼみが出ていなければ、結果表2に出蕾日を記録
-                        if value_pre_tsubomi == 0:
-                            slist[4].cell(row=row, column=column).value = int(date_name)
-                            
-                    #花データが１のとき
-                    elif value_flower == 1:
-                        #調査票を赤に塗る
-                        sheet.cell(row=row+1, column=column).fill = get_red()
-                        #前日花が咲いていなければ、結果表に開花日を記録
-                        if value_pre_flower == 0:
-                            slist[1].cell(row=row+1, column=column).value = int(date_name)
-                            
-                    elif value_flower == 2:
-                        #調査票を赤に塗る
-                        sheet.cell(row=row+1, column=column).fill = get_red(value_flower*70)
-                        #前日花が咲いていなければ、結果表に開花日を記録
-                        if value_pre_flower == 0:
-                            slist[4].cell(row=row+1, column=column).value = int(date_name)
-                    
+                            if value_pre_tsubomi == 0:
+                                slist[3*value_flower-2].cell(row=row, column=column).value = int(date_name)
+                            if value_tsubomi > max_value:
+                                max_value = value_tsubomi
+                                    
+                    #花データが0以外の数字のとき
+                    if value_flower != None and str(value_flower).isdecimal():
+                        if value_flower != 0:
+                            #調査票を赤に塗る
+                            sheet.cell(row=row+1, column=column).fill = get_red(value_flower*70)
+                            #前日花が咲いていなければ、結果表に開花日を記録
+                            if value_pre_flower == 0:
+                                slist[3*value_flower-2].cell(row=row+1, column=column).value = int(date_name)
+                            if value_flower > max_value:
+                                max_value = value_flower
                             
     #保存_調査票_test用
-    # wb.save(save_tyousa_path + "\\" + str(next_date_name) + ".xlsx")                
+    # wb.save(save_tyousa_path + "\\" + str(next_date_name) + ".xlsx")     
                                 
     for row in range(3, sheet.max_row+1):
         for column in range(2, sheet.max_column+1):
             slist[0].cell(row=row, column=column).value = sheet.cell(row=row, column=column).value
             slist[0].cell(row=row, column=column).fill = sheet.cell(row=row, column=column).fill._StyleProxy__target
             
+print(max_value)           
 #３行目からは
 for row in range(3, sheet.max_row+1):
     for column in range(1, sheet.max_column+1):
         value_init = slist[1].cell(row=row, column=column).value
         value_init_2 = slist[4].cell(row=row, column=column).value
-        if column >= 2:
-            #調査票の中身を空欄に
-            sheet.cell(row=row, column=column).value = None
+        # if column >= 2:
+        #     #調査票の中身を空欄に
+        #     sheet.cell(row=row, column=column).value = None
         #tsubomi用にコピー
         if row % 2 == 1:
             slist[2].cell(row=(row//2)+2, column=column).value = value_init
@@ -209,12 +204,15 @@ for row in range(3, sheet.max_row+1):
 
 #保存_調査票
 wb.save(save_tyousa_path + "\\" + str(next_date_name) + ".xlsx") 
-
+for i in range(1, max_value+1):
+    blist[3*i-2].save(save_result_path + "\\" + str(date_name) + "_result_" + f"{i:02x}"+ ".xlsx")
+    blist[3*i-1].save(save_result_path + "\\" + str(date_name) + "_result_tsubomi_" + f"{i:02x}"+ ".xlsx")
+    blist[3*i].save(save_result_path + "\\" + str(date_name) + "_result_flower_" + f"{i:02x}"+ ".xlsx")
 #保存_結果表（出力日は、エクセルリストの最後の日付）
-blist[1].save(save_result_path + "\\" + str(date_name) + "_result.xlsx")
-blist[2].save(save_result_path + "\\" + str(date_name) + "_result_tsubomi.xlsx")
-blist[3].save(save_result_path + "\\" + str(date_name) + "_result_flower.xlsx")
-blist[4].save(save_result_path + "\\" + str(date_name) + "_result_02.xlsx")
-blist[5].save(save_result_path + "\\" + str(date_name) + "_result_tsubomi_02.xlsx")
-blist[6].save(save_result_path + "\\" + str(date_name) + "_result_flower_02.xlsx")
+# blist[1].save(save_result_path + "\\" + str(date_name) + "_result.xlsx")
+# blist[2].save(save_result_path + "\\" + str(date_name) + "_result_tsubomi.xlsx")
+# blist[3].save(save_result_path + "\\" + str(date_name) + "_result_flower.xlsx")
+# blist[4].save(save_result_path + "\\" + str(date_name) + "_result_02.xlsx")
+# blist[5].save(save_result_path + "\\" + str(date_name) + "_result_tsubomi_02.xlsx")
+# blist[6].save(save_result_path + "\\" + str(date_name) + "_result_flower_02.xlsx")
 wb_uekae.save(save_result_path + "\\" + str(date_name) + "_result_uekae.xlsx")
